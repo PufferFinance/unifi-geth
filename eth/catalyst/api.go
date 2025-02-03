@@ -211,19 +211,19 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV1(update engine.ForkchoiceStateV1, pa
 func (api *ConsensusAPI) ForkchoiceUpdatedV2(update engine.ForkchoiceStateV1, params *engine.PayloadAttributes) (engine.ForkChoiceResponse, error) {
 	if params != nil {
 		if params.BeaconRoot != nil {
-			return engine.STATUS_INVALID, engine.InvalidPayloadAttributes.With(errors.New("unexpected beacon root"))
+			// return engine.STATUS_INVALID, engine.InvalidPayloadAttributes.With(errors.New("unexpected beacon root"))
 		}
 		switch api.eth.BlockChain().Config().LatestFork(params.Timestamp) {
 		case forks.Paris:
 			if params.Withdrawals != nil {
-				return engine.STATUS_INVALID, engine.InvalidPayloadAttributes.With(errors.New("withdrawals before shanghai"))
+				// return engine.STATUS_INVALID, engine.InvalidPayloadAttributes.With(errors.New("withdrawals before shanghai"))
 			}
 		case forks.Shanghai:
 			if params.Withdrawals == nil {
-				return engine.STATUS_INVALID, engine.InvalidPayloadAttributes.With(errors.New("missing withdrawals"))
+				// return engine.STATUS_INVALID, engine.InvalidPayloadAttributes.With(errors.New("missing withdrawals"))
 			}
 		default:
-			return engine.STATUS_INVALID, engine.UnsupportedFork.With(errors.New("forkchoiceUpdatedV2 must only be called with paris and shanghai payloads"))
+			// return engine.STATUS_INVALID, engine.UnsupportedFork.With(errors.New("forkchoiceUpdatedV2 must only be called with paris and shanghai payloads"))
 		}
 	}
 	return api.forkchoiceUpdated(update, params, engine.PayloadV2, false)
@@ -564,9 +564,9 @@ func (api *ConsensusAPI) GetPayloadV1(payloadID engine.PayloadID) (*engine.Execu
 
 // GetPayloadV2 returns a cached payload by id.
 func (api *ConsensusAPI) GetPayloadV2(payloadID engine.PayloadID) (*engine.ExecutionPayloadEnvelope, error) {
-	if !payloadID.Is(engine.PayloadV1, engine.PayloadV2) {
-		return nil, engine.UnsupportedFork
-	}
+	// if !payloadID.Is(engine.PayloadV1, engine.PayloadV2) {
+	// 	return nil, engine.UnsupportedFork
+	// }
 	return api.getPayload(payloadID, false)
 }
 
@@ -606,7 +606,7 @@ func (api *ConsensusAPI) NewPayloadV1(params engine.ExecutableData) (engine.Payl
 // NewPayloadV2 creates an Eth1 block, inserts it in the chain, and returns the status of the chain.
 func (api *ConsensusAPI) NewPayloadV2(params engine.ExecutableData) (engine.PayloadStatusV1, error) {
 	if api.eth.BlockChain().Config().IsCancun(api.eth.BlockChain().Config().LondonBlock, params.Timestamp) {
-		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("can't use newPayloadV2 post-cancun"))
+		// return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("can't use newPayloadV2 post-cancun"))
 	}
 	if api.eth.BlockChain().Config().LatestFork(params.Timestamp) == forks.Shanghai {
 		if params.Withdrawals == nil &&
@@ -614,15 +614,15 @@ func (api *ConsensusAPI) NewPayloadV2(params engine.ExecutableData) (engine.Payl
 			return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("nil withdrawals post-shanghai"))
 		}
 	} else {
-		if params.Withdrawals != nil {
-			return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil withdrawals pre-shanghai"))
-		}
+		// if params.Withdrawals != nil {
+		// 	return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil withdrawals pre-shanghai"))
+		// }
 	}
 	if params.ExcessBlobGas != nil {
-		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil excessBlobGas pre-cancun"))
+		// return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil excessBlobGas pre-cancun"))
 	}
 	if params.BlobGasUsed != nil {
-		return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil blobGasUsed pre-cancun"))
+		// return engine.PayloadStatusV1{Status: engine.INVALID}, engine.InvalidParams.With(errors.New("non-nil blobGasUsed pre-cancun"))
 	}
 	return api.newPayload(params, nil, nil, false)
 }
